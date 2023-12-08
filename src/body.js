@@ -406,6 +406,10 @@ export function clone(instance) {
 		p2 = new PassThrough();
 		body.pipe(p1);
 		body.pipe(p2);
+		body.on("error", error => {
+			p1.destroy(error)
+			p2.destroy(error)
+		})
 		// set instance body to teed body and return the other teed body
 		instance[INTERNALS].body = p1;
 		body = p2;
@@ -512,6 +516,7 @@ export function writeToStream(dest, instance) {
 	} else {
 		// body is stream
 		body.pipe(dest);
+		body.on("error", error => dest.destroy(error))
 	}
 }
 
